@@ -1,23 +1,31 @@
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
-
-import React from 'react'
-import Head from './components/Head';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import { mediaDevices, RTCView } from 'react-native-webrtc';
 
 const App = () => {
-  return (
-    <View>
-      <Text>App</Text>
-      <Head> </Head>
-    </View>
-  )
-}
+  const [stream, setStream] = useState(null);
 
-export default App
+  useEffect(() => {
+    const getMedia = async () => {
+      try {
+        const localStream = await mediaDevices.getUserMedia({
+          audio: true,
+          video: true,
+        });
+        setStream(localStream);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    getMedia();
+  }, []);
+
+  return (
+    <View style={{ flex: 1 }}>
+      {stream && <RTCView streamURL={stream.toURL()} style={{ flex: 1 }} />}
+    </View>
+  );
+};
+
+export default App;
